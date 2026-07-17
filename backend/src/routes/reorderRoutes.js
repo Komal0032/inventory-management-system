@@ -8,11 +8,13 @@ console.log(controller);
 const {
     getReorders,
     createReorder,
-    verifyOTP
+    verifyOTP,
+    updateReorderStatus
 } = require("../controllers/reorderController");
 
 router.get("/", getReorders);
 router.post("/", createReorder);
 router.post("/verify-otp", verifyOTP);
+router.patch("/:id/status", updateReorderStatus);
 
 module.exports = router;

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { 
   Package, 
   ShoppingCart, 
@@ -13,8 +14,10 @@ import {
 import API from "../api/axios";
 import "./Dashboard.css";
 import DashboardChart from "../components/DashboardChart";
+import { exportDashboardExcel } from "../utils/exportDashboardExcel";
 
 function Dashboard() {
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     totalProducts: 0,
     totalReorders: 0,
@@ -37,11 +40,23 @@ function Dashboard() {
       setLoading(true);
       // Fetch stats
       const statsResponse = await API.get("/dashboard/stats");
-      setStats(statsResponse.data);
+    setStats({
+  totalProducts: statsResponse.data.totalProducts || 0,
+  totalReorders: statsResponse.data.totalReorders || 0,
+  lowStockProducts: statsResponse.data.lowStockProducts || 0,
+  inventoryValue: statsResponse.data.inventoryValue || 0,
+  pendingReorders: statsResponse.data.pendingReorders || 0,
+  completedReorders: statsResponse.data.completedReorders || 0,
+  failedReorders: statsResponse.data.failedReorders || 0
+});
 
       // Fetch recent activities
       const activitiesResponse = await API.get("/dashboard/recent-activities");
-      setRecentActivities(activitiesResponse.data || []);
+     setRecentActivities(
+  Array.isArray(activitiesResponse.data)
+    ? activitiesResponse.data
+    : []
+);
 
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
@@ -83,7 +98,8 @@ function Dashboard() {
     },
     {
       title: "Inventory Value",
-      value: `₹${stats.inventoryValue.toLocaleString()}`,
+      value: `₹${(stats.inventoryValue || 0).toLocaleString()}`,
+
       icon: TrendingUp,
       color: "success",
       bgColor: "bg-success-subtle",
@@ -249,31 +265,48 @@ function Dashboard() {
         </div>
 
         {/* Quick Actions */}
-        <div className="col-lg-4">
-          <div className="quick-actions-card">
-            <h5 className="quick-actions-title">Quick Actions</h5>
-            <div className="quick-actions-list">
-              <button className="quick-action-btn primary">
-                <Package size={20} />
-                <span>Add New Product</span>
-              </button>
-              <button className="quick-action-btn info">
-                <ShoppingCart size={20} />
-                <span>Create Reorder</span>
-              </button>
-              <button className="quick-action-btn warning">
-                <AlertTriangle size={20} />
-                <span>View Low Stock</span>
-              </button>
-              <button className="quick-action-btn success">
-                <TrendingUp size={20} />
-                <span>Generate Report</span>
-              </button>
-            </div>
+        <div className="quick-actions-list">
+
+  <button
+    className="quick-action-btn primary"
+    onClick={() => navigate("/inventory")}
+  >
+    <Package size={20} />
+    <span>Add New Product</span>
+  </button>
+
+
+  <button
+    className="quick-action-btn info"
+    onClick={() => navigate("/reorders")}
+  >
+    <ShoppingCart size={20} />
+    <span>Create Reorder</span>
+  </button>
+
+
+  <button
+    className="quick-action-btn warning"
+    onClick={() => navigate("/inventory?filter=low")}
+  >
+    <AlertTriangle size={20} />
+    <span>View Low Stock</span>
+  </button>
+
+
+ <button
+  className="quick-action-btn success"
+  onClick={() => exportDashboardExcel(stats)}
+>
+  <TrendingUp size={20} />
+  <span>Generate Report</span>
+</button>
+
+</div>
           </div>
         </div>
-      </div>
-    </div>
+    
+    
   );
 }
 

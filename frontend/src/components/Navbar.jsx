@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Bell, Search, User, Settings, LogOut, Menu } from "lucide-react";
 import NotificationBell from "./NotificationBell";
 import "./Navbar.css";
+import { logout } from "../utils/logout";
 
 function Navbar({ toggleSidebar }) {
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -79,10 +80,13 @@ function Navbar({ toggleSidebar }) {
                     <span>Settings</span>
                   </button>
                   <div className="dropdown-divider"></div>
-                  <button className="dropdown-item logout-item">
-                    <LogOut size={16} />
-                    <span>Logout</span>
-                  </button>
+                  <button
+    className="dropdown-item logout-item"
+    onClick={logout}
+>
+    <LogOut size={16} />
+    <span>Logout</span>
+</button>
                 </div>
                 <div 
                   className="dropdown-backdrop"

@@ -139,11 +139,10 @@ const updateStock = async (id, quantity) => {
 
   // Check Low Stock
 if (product.available_quantity < product.low_stock_threshold) {
-
   // Save notification in database
   await notificationService.createNotification(
     "Low Stock Alert",
-    `${product.product_name} is low in stock. Current Quantity: ${product.available_quantity}`
+    `${product.product_name} is low in stock. Current Quantity: $//{product.available_quantity}`
   );
 
   // Send real-time notification

@@ -215,10 +215,59 @@ const verifyOTP = async (req, res) => {
 
 };
 
+const updateReorderStatus = async (req, res) => {
+
+    try {
+
+        const { status } = req.body;
+
+        const result = await pool.query(
+            `
+            UPDATE reorder_requests
+            SET status = $1
+            WHERE id = $2
+            RETURNING *;
+            `,
+            [
+                status,
+                req.params.id
+            ]
+        );
+
+
+        if(result.rows.length === 0){
+
+            return res.status(404).json({
+                success:false,
+                message:"Reorder not found"
+            });
+
+        }
+
+
+        res.json({
+            success:true,
+            message:"Status updated",
+            data:result.rows[0]
+        });
+
+
+    } catch(error){
+
+        res.status(500).json({
+            success:false,
+            message:error.message
+        });
+
+    }
+
+};
+
 
 
 module.exports = {
     getReorders,
     createReorder,
-    verifyOTP
+    verifyOTP,
+    updateReorderStatus
 };

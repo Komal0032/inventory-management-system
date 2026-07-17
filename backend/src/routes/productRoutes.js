@@ -24,12 +24,14 @@ router.put(
   productController.updateProduct
 );
 
-//delete product
-router.delete("/:id", productController.deleteProduct);
-
 router.get("/hello", (req, res) => {
   res.json({ message: "Hello from Product Routes" });
 });
+
+//delete product
+router.delete("/:id", productController.deleteProduct);
+
+
 //patch 
 router.patch("/:id/stock", productController.updateStock);
 

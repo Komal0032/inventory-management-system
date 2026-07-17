@@ -46,11 +46,15 @@ const createReorder = async (
     const result = await pool.query(query, values);
 
     return result.rows[0];
-
-  } catch (error) {
-    console.error("Reorder Service Error:", error);
-    throw error;
-  }
+} catch (error) {
+  console.error("========== REORDER ERROR ==========");
+  console.error("Message:", error.message);
+  console.error("Code:", error.code);
+  console.error("Detail:", error.detail);
+  console.error("Constraint:", error.constraint);
+  console.error(error);
+  throw error;
+}
 };
 
 module.exports = {

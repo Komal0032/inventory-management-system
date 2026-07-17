@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import API from "../api/axios";
 import ProductTable from "../components/ProductTable";
 import AddProduct from "./AddProduct";
@@ -8,6 +9,7 @@ import UpdateStock from "./UpdateStock";
 import { exportProductsToExcel } from "../utils/exportExcel";
 
 function Inventory() {
+  const [searchParams] = useSearchParams();
 
   const [products, setProducts] = useState([]);
    const [showAddModal, setShowAddModal] = useState(false);
@@ -20,15 +22,22 @@ const [search, setSearch] = useState("");
 
 const [showLowStock, setShowLowStock] = useState(false);
 
-  const fetchProducts = async () => {
+ const fetchProducts = async () => {
   try {
     const response = await API.get(
       `/products?search=${search}`
     );
 
-    setProducts(response.data.data);
+    console.log("Products API:", response.data);
+
+    setProducts(response.data?.data || []);
+
   } catch (error) {
+
     console.log(error);
+
+    setProducts([]);
+
   }
 };
 
@@ -98,11 +107,11 @@ const closeStockModal = () => {
 };
 
 const filteredProducts = showLowStock
-  ? products.filter(
+  ? (products || []).filter(
       (product) =>
         product.available_quantity <= product.low_stock_threshold
     )
-  : products;
+  : (products || []);
 
   return (
 
@@ -133,6 +142,7 @@ const filteredProducts = showLowStock
     value={search}
     onChange={(e) => setSearch(e.target.value)}
   />
+
 </div>
 
 <div className="d-flex gap-2 mb-3">

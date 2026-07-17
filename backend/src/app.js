@@ -9,6 +9,7 @@ const reorderRoutes = require("./routes/reorderRoutes");
 
 const notificationRoutes = require("./routes/notificationRoutes");
 const path = require("path");
+const authRoutes = require("./routes/authRoutes");
 
 
 const app = express();
@@ -34,6 +35,8 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/reorders", reorderRoutes);
 
 app.use("/api/notifications", notificationRoutes);
+
+app.use("/api/auth", authRoutes);
 
 const fs = require("fs");
 
