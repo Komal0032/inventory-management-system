@@ -22,9 +22,9 @@ app.use(express.json());
 
 app.use("/api/products", productRoutes);
 
-app.get("/", (req, res) => {
-    res.send("Inventory API Running");
-});
+//app.get("/", (req, res) => {
+   // res.send("Inventory API Running");
+//});
 
 app.use("/api/dashboard", dashboardRoutes);
 
