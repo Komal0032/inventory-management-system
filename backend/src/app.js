@@ -32,6 +32,12 @@ app.use("/api/reorders", reorderRoutes);
 
 app.use("/api/notifications", notificationRoutes);
 
+const fs = require("fs");
+
+const distPath = path.join(__dirname, "../../frontend/dist");
+console.log("React dist exists:", fs.existsSync(distPath));
+console.log("React index exists:", fs.existsSync(path.join(distPath, "index.html")));
+
 // Serve React build files
 app.use(express.static(path.join(__dirname, "../../frontend/dist")));
 
