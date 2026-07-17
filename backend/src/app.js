@@ -8,6 +8,7 @@ const notificationRoutes = require("./routes/notificationRoutes");
 const authRoutes = require("./routes/authRoutes");
 
 const app = express();
+console.log("=== NEW APP.JS DEPLOYED ===");
 
 // CORS Configuration
 const allowedOrigins = [
