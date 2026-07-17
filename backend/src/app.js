@@ -1,55 +1,141 @@
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
+const fs = require("fs");
 
 const productRoutes = require("./routes/productRoutes");
-const dashboardRoutes =
-require("./routes/dashboardRoutes");
-
+const dashboardRoutes = require("./routes/dashboardRoutes");
 const reorderRoutes = require("./routes/reorderRoutes");
-
 const notificationRoutes = require("./routes/notificationRoutes");
-const path = require("path");
 const authRoutes = require("./routes/authRoutes");
 
 
 const app = express();
 
-// CORS configuration
-app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "https://inventory-management-system-production-5ffc.up.railway.app"
-  ],
-  credentials: true
-}));
+
+// CORS Configuration
+
+const allowedOrigins = [
+
+  "http://localhost:5173",
+
+  process.env.FRONTEND_URL
+
+];
+
+
+app.use(
+  cors({
+
+    origin: function(origin, callback){
+
+      // allow postman / server requests
+      if(!origin) {
+        return callback(null,true);
+      }
+
+
+      if(allowedOrigins.includes(origin)){
+
+        return callback(null,true);
+
+      }
+
+
+      return callback(
+        new Error("Not allowed by CORS")
+      );
+
+    },
+
+    credentials:true
+
+  })
+);
+
+
+
 app.use(express.json());
 
-app.use("/api/products", productRoutes);
 
-//app.get("/", (req, res) => {
-   // res.send("Inventory API Running");
-//});
 
-app.use("/api/dashboard", dashboardRoutes);
+// API Routes
 
-app.use("/api/reorders", reorderRoutes);
+app.use(
+  "/api/products",
+  productRoutes
+);
 
-app.use("/api/notifications", notificationRoutes);
 
-app.use("/api/auth", authRoutes);
+app.use(
+  "/api/dashboard",
+  dashboardRoutes
+);
 
-const fs = require("fs");
 
-const distPath = path.join(__dirname, "../../frontend/dist");
-console.log("React dist exists:", fs.existsSync(distPath));
-console.log("React index exists:", fs.existsSync(path.join(distPath, "index.html")));
+app.use(
+  "/api/reorders",
+  reorderRoutes
+);
 
-// Serve React build files
-app.use(express.static(path.join(__dirname, "../../frontend/dist")));
 
-// React Router fallback
-app.get("/{*any}", (req, res) => {
-  res.sendFile(path.join(__dirname, "../../frontend/dist/index.html"));
-});
+app.use(
+  "/api/notifications",
+  notificationRoutes
+);
+
+
+app.use(
+  "/api/auth",
+  authRoutes
+);
+
+
+
+// Serve React Frontend
+
+const distPath = path.join(
+  __dirname,
+  "../../frontend/dist"
+);
+
+
+console.log(
+  "React dist exists:",
+  fs.existsSync(distPath)
+);
+
+
+console.log(
+  "React index exists:",
+  fs.existsSync(
+    path.join(distPath,"index.html")
+  )
+);
+
+
+
+app.use(
+  express.static(distPath)
+);
+
+
+
+// React Router support
+
+app.get(
+  "*",
+  (req,res)=>{
+
+    res.sendFile(
+      path.join(
+        distPath,
+        "index.html"
+      )
+    );
+
+  }
+);
+
 
 module.exports = app;

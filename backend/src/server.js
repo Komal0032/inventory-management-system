@@ -1,24 +1,62 @@
+require("dotenv").config();
+
 const http = require("http");
+
 const app = require("./app");
+
 const { initializeSocket } = require("./config/socket");
-
-const PORT = process.env.PORT || 5000;
-
-const server = http.createServer(app);
-
-// Initialize Socket.IO
-initializeSocket(server);
 
 const pool = require("./config/db");
 
-pool.query("SELECT current_database(), current_schema();")
-  .then((result) => {
-    console.log(result.rows);
-  })
-  .catch(console.error);
 
-  
+const PORT = process.env.PORT || 5000;
 
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+
+
+const server = http.createServer(app);
+
+
+
+// Initialize Socket.IO
+
+initializeSocket(server);
+
+
+
+
+// Database connection check
+
+pool.query(
+  "SELECT current_database(), current_schema();"
+)
+.then((result)=>{
+
+  console.log(
+    "Database Connected:",
+    result.rows[0]
+  );
+
+})
+.catch((error)=>{
+
+  console.error(
+    "Database Connection Error:",
+    error.message
+  );
+
 });
+
+
+
+
+
+server.listen(
+  PORT,
+  ()=>{
+
+    console.log(
+      `Server running on port ${PORT}`
+    );
+
+  }
+);
