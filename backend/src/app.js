@@ -8,7 +8,7 @@ require("./routes/dashboardRoutes");
 const reorderRoutes = require("./routes/reorderRoutes");
 
 const notificationRoutes = require("./routes/notificationRoutes");
-
+const path = require("path");
 
 
 const app = express();
@@ -31,5 +31,13 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/reorders", reorderRoutes);
 
 app.use("/api/notifications", notificationRoutes);
+
+// Serve React build files
+app.use(express.static(path.join(__dirname, "../../frontend/dist")));
+
+// React Router fallback
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../../frontend/dist/index.html"));
+});
 
 module.exports = app;
