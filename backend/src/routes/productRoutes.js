@@ -14,6 +14,10 @@ router.post(
 // Get All Products
 router.get("/", productController.getProducts);
 
+router.get("/hello", (req, res) => {
+  res.json({ message: "Hello from Product Routes" });
+});
+
 // Get Product By ID
 router.get("/:id", productController.getProduct);
 
@@ -24,9 +28,7 @@ router.put(
   productController.updateProduct
 );
 
-router.get("/hello", (req, res) => {
-  res.json({ message: "Hello from Product Routes" });
-});
+
 
 //delete product
 router.delete("/:id", productController.deleteProduct);

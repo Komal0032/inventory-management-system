@@ -10,23 +10,25 @@ const addProduct = async (req, res) => {
       message: "Product added successfully",
       data: product,
     });
+
   } catch (error) {
+    console.error("ADD PRODUCT ERROR:", error);
+
     res.status(500).json({
       success: false,
-      message: error.message,
+      message: error.message || "Server Error",
+      code: error.code || null,
+      detail: error.detail || null,
     });
   }
 };
 
 // Get All Products
 const getProducts = async (req, res) => {
-
   try {
-
     const search = req.query.search || "";
 
-    const products =
-      await productService.getAllProducts(search);
+    const products = await productService.getAllProducts(search);
 
     res.status(200).json({
       success: true,
@@ -35,15 +37,18 @@ const getProducts = async (req, res) => {
     });
 
   } catch (error) {
+    console.error("========== GET PRODUCTS ERROR ==========");
+    console.error(error);
 
     res.status(500).json({
       success: false,
-      message: error.message,
+      message: error.message || "Unknown Error",
+      code: error.code || null,
+      detail: error.detail || null,
     });
-
   }
-
 };
+
 // Get Product By ID
 const getProduct = async (req, res) => {
   try {
@@ -62,9 +67,13 @@ const getProduct = async (req, res) => {
     });
 
   } catch (error) {
+    console.error("GET PRODUCT ERROR:", error);
+
     res.status(500).json({
       success: false,
-      message: error.message,
+      message: error.message || "Server Error",
+      code: error.code || null,
+      detail: error.detail || null,
     });
   }
 };
@@ -91,9 +100,13 @@ const updateProduct = async (req, res) => {
     });
 
   } catch (error) {
+    console.error("UPDATE PRODUCT ERROR:", error);
+
     res.status(500).json({
       success: false,
-      message: error.message,
+      message: error.message || "Server Error",
+      code: error.code || null,
+      detail: error.detail || null,
     });
   }
 };
@@ -117,17 +130,20 @@ const deleteProduct = async (req, res) => {
     });
 
   } catch (error) {
+    console.error("DELETE PRODUCT ERROR:", error);
+
     res.status(500).json({
       success: false,
-      message: error.message,
+      message: error.message || "Server Error",
+      code: error.code || null,
+      detail: error.detail || null,
     });
   }
 };
 
+// Update Stock
 const updateStock = async (req, res) => {
-
   try {
-
     const { available_quantity } = req.body;
 
     const product = await productService.updateStock(
@@ -148,23 +164,16 @@ const updateStock = async (req, res) => {
       data: product,
     });
 
-  }  catch (error) {
+  } catch (error) {
+    console.error("UPDATE STOCK ERROR:", error);
 
-  console.error("ADD PRODUCT ERROR:", error);
-
-  res.status(500).json({
-    success: false,
-    message: error.message || "Server Error",
-  });
-
-
-
-  res.status(500).json({
-    success: false,
-    message: error.message,
-  });
-}
-
+    res.status(500).json({
+      success: false,
+      message: error.message || "Server Error",
+      code: error.code || null,
+      detail: error.detail || null,
+    });
+  }
 };
 
 module.exports = {
@@ -173,5 +182,5 @@ module.exports = {
   getProduct,
   updateProduct,
   deleteProduct,
-  updateStock
+  updateStock,
 };
