@@ -15,9 +15,12 @@ const app = express();
 
 // CORS configuration
 app.use(cors({
-    origin: "http://localhost:5173"
+  origin: [
+    "http://localhost:5173",
+    "https://inventory-management-system-production-5ffc.up.railway.app"
+  ],
+  credentials: true
 }));
-
 app.use(express.json());
 
 app.use("/api/products", productRoutes);
