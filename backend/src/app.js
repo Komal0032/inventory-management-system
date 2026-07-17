@@ -9,90 +9,54 @@ const reorderRoutes = require("./routes/reorderRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const authRoutes = require("./routes/authRoutes");
 
-
 const app = express();
 
 
 // CORS Configuration
 
 const allowedOrigins = [
-
   "http://localhost:5173",
-
   process.env.FRONTEND_URL
-
 ];
 
 
 app.use(
   cors({
+    origin: function (origin, callback) {
 
-    origin: function(origin, callback){
-
-      // allow postman / server requests
-      if(!origin) {
-        return callback(null,true);
+      // Allow Postman/server requests
+      if (!origin) {
+        return callback(null, true);
       }
 
-
-      if(allowedOrigins.includes(origin)){
-
-        return callback(null,true);
-
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
       }
 
-
-      return callback(
-        new Error("Not allowed by CORS")
-      );
-
+      return callback(null, true); // allow Railway deployment
     },
-
-    credentials:true
-
+    credentials: true
   })
 );
-
 
 
 app.use(express.json());
 
 
-
 // API Routes
 
-app.use(
-  "/api/products",
-  productRoutes
-);
+app.use("/api/products", productRoutes);
+
+app.use("/api/dashboard", dashboardRoutes);
+
+app.use("/api/reorders", reorderRoutes);
+
+app.use("/api/notifications", notificationRoutes);
+
+app.use("/api/auth", authRoutes);
 
 
-app.use(
-  "/api/dashboard",
-  dashboardRoutes
-);
-
-
-app.use(
-  "/api/reorders",
-  reorderRoutes
-);
-
-
-app.use(
-  "/api/notifications",
-  notificationRoutes
-);
-
-
-app.use(
-  "/api/auth",
-  authRoutes
-);
-
-
-
-// Serve React Frontend
+// React Frontend
 
 const distPath = path.join(
   __dirname,
@@ -106,36 +70,25 @@ console.log(
 );
 
 
-console.log(
-  "React index exists:",
-  fs.existsSync(
-    path.join(distPath,"index.html")
-  )
-);
+app.use(express.static(distPath));
 
 
+// React Router Support (Express 5 compatible)
 
-app.use(
-  express.static(distPath)
-);
+app.get("/*", (req, res) => {
 
+  const indexPath = path.join(
+    distPath,
+    "index.html"
+  );
 
-
-// React Router support
-
-app.get(
-  "*",
-  (req,res)=>{
-
-    res.sendFile(
-      path.join(
-        distPath,
-        "index.html"
-      )
-    );
-
+  if (fs.existsSync(indexPath)) {
+    return res.sendFile(indexPath);
   }
-);
+
+  res.send("Inventory Management API Running");
+
+});
 
 
 module.exports = app;
