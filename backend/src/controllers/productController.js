@@ -149,8 +149,15 @@ const updateStock = async (req, res) => {
     });
 
   }  catch (error) {
-  console.error("UPDATE STOCK ERROR:");
-  console.error(error);
+
+  console.error("ADD PRODUCT ERROR:", error);
+
+  res.status(500).json({
+    success: false,
+    message: error.message || "Server Error",
+  });
+
+
 
   res.status(500).json({
     success: false,
