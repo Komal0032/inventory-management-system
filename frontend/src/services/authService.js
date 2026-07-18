@@ -1,4 +1,4 @@
-import API from "./api"; // Adjust the path if needed
+import API from "./axios";
 
 export const loginUser = async (userData) => {
   const response = await API.post("/auth/login", userData);
