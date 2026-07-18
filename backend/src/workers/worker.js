@@ -2,18 +2,24 @@ const { Worker } = require("bullmq");
 const pool = require("../config/db");
 const redisConnection = require("../config/redis");
 
+
 const worker = new Worker(
     "reorder-process",
+
     async (job) => {
 
         const { reorderId } = job.data;
 
-        console.log(`Supplier received reorder #${reorderId}`);
+        console.log(`📦 Supplier received reorder #${reorderId}`);
 
-        // Wait 2 seconds
-        await new Promise(resolve => setTimeout(resolve, 2000));
 
-        // Processing
+        // Supplier response delay
+        await new Promise(resolve =>
+            setTimeout(resolve, 2000)
+        );
+
+
+        // Update status
         await pool.query(
             `
             UPDATE reorder_requests
@@ -23,17 +29,40 @@ const worker = new Worker(
             [reorderId]
         );
 
-        console.log("Supplier Processing...");
 
-        // Wait 5 seconds
-        await new Promise(resolve => setTimeout(resolve, 5000));
+        console.log(
+            `⚙️ Reorder #${reorderId} Processing`
+        );
 
-        // 30% failure chance
+
+        // Supplier processing time
+        await new Promise(resolve =>
+            setTimeout(resolve, 5000)
+        );
+
+
+        // Random failure simulation
         const failed = Math.random() < 0.3;
 
+
         if (failed) {
-            throw new Error("Supplier service is temporarily unavailable.");
+
+            await pool.query(
+                `
+                UPDATE reorder_requests
+                SET status = 'Failed'
+                WHERE id = $1
+                `,
+                [reorderId]
+            );
+
+
+            throw new Error(
+                "Supplier service temporarily unavailable"
+            );
         }
+
+
 
         // Completed
         await pool.query(
@@ -45,31 +74,59 @@ const worker = new Worker(
             [reorderId]
         );
 
-        console.log("Supplier Completed Order");
 
-        return true;
+        console.log(
+            `✅ Reorder #${reorderId} Completed`
+        );
+
+
+        return {
+            reorderId,
+            status: "Completed"
+        };
+
     },
+
     {
-        connection: redisConnection
+        connection: redisConnection,
+        concurrency: 1
     }
 );
 
-worker.on("completed", (job) => {
-    console.log(`✅ Job ${job.id} completed successfully.`);
-});
 
-worker.on("failed", async (job, err) => {
 
-    await pool.query(
-        `
-        UPDATE reorder_requests
-        SET status = 'Failed'
-        WHERE id = $1
-        `,
-        [job.data.reorderId]
+worker.on("completed", (job, result) => {
+
+    console.log(
+        `✅ Job ${job.id} completed`,
+        result
     );
 
-    console.log(`❌ Job ${job.id} failed: ${err.message}`);
 });
 
-console.log("🚀 BullMQ Worker Started...");
+
+
+worker.on("failed", (job, err) => {
+
+    console.log(
+        `❌ Job ${job.id} failed: ${err.message}`
+    );
+
+});
+
+
+
+worker.on("error", (err) => {
+
+    console.log(
+        "❌ Worker Error:",
+        err.message
+    );
+
+});
+
+
+console.log("🚀 BullMQ Worker Started");
+
+
+module.exports = worker;
