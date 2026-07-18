@@ -26,5 +26,5 @@ pool.query("SELECT current_database(), current_schema();")
     console.log("✅ Database Connected:", result.rows[0]);
   })
   .catch((error) => {
-    console.error("❌ Database Connection Error:", error.message);
-  });
+ console.error("❌ Database Connection Error:", error);
+});

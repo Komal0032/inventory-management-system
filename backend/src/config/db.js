@@ -8,4 +8,15 @@ const pool = new Pool({
     }
 });
 
+
+pool.on("connect", () => {
+    console.log("✅ PostgreSQL Pool Connected");
+});
+
+
+pool.on("error", (err) => {
+    console.log("❌ PostgreSQL Pool Error:", err.message);
+});
+
+
 module.exports = pool;
